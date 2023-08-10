@@ -223,6 +223,34 @@ class BertEmbeds:
             if (labels[0] == "UNTAGGED_ENTITY"):
                 return False
             return True
+    def create_entity_labels_file(self,full_entities_dict):
+        with open("labels.txt","w") as fp:
+            for term in self.terms_dict:
+                if (term not in full_entities_dict and term.lower() not in self.bootstrap_entities):
+                    fp.write("OTHER 0 " + term + "\n")
+                    continue
+                if (term not in full_entities_dict): #These are vocab terms that did not show up in a cluster but are present in bootstrap list
+                    lc_term = term.lower()
+                    counts_str = len(self.bootstrap_entities[lc_term])*"0/"
+                    fp.write('/'.join(self.bootstrap_entities[lc_term]) + ' ' + counts_str.rstrip('/') + ' ' + term + '\n') #Note the term output is case sensitive. Just the indexed version is case insenstive
+                    continue
+                out_entity_dict = {}
+                for entity in full_entities_dict[term]:
+                    assert(entity not in out_entity_dict)
+                    out_entity_dict[entity] = full_entities_dict[term][entity]
+                sorted_d = OrderedDict(sorted(out_entity_dict.items(), key=lambda kv: kv[1], reverse=True))
+                entity_str = ""
+                count_str = ""
+                for entity in sorted_d:
+                    if (len(entity_str) == 0):
+                        entity_str = entity
+                        count_str =  str(sorted_d[entity])
+                    else:
+                        entity_str += '/' +  entity
+                        count_str +=  '/' + str(sorted_d[entity])
+                if (len(entity_str) > 0):
+                    fp.write(entity_str + ' ' + count_str + ' ' + term + "\n")
+
 
     def subword_clustering(self):
             '''
