@@ -11,7 +11,7 @@ import sys
 import random
 import time
 import os
-
+import tqdm
 
 SINGLETONS_TAG  = "_singletons_ "
 EMPTY_TAG = "_empty_ "
@@ -268,7 +268,7 @@ class BertEmbeds:
             total = len(self.terms_dict)
             dfp = open("adaptive_debug_pivots.txt","w")
             esupfp = open("entity_support.txt","w")
-            for key in self.terms_dict:
+            for key in tqdm.tqdm(self.terms_dict):
                 if (key.startswith('[') or len(key) < 2):
                     count += 1
                     continue
@@ -300,9 +300,6 @@ class BertEmbeds:
                 else:
                     print("***Empty arr for term:",key)
                     empty_arr.append(key)
-                #if (count >= 350):
-                #    pdb.set_trace()
-                #    break
 
             dfp.write(SINGLETONS_TAG + str(singletons_arr) + "\n")
             dfp.write(EMPTY_TAG + str(empty_arr) + "\n")
@@ -318,19 +315,6 @@ class BertEmbeds:
             if (len(curr_entities_dict) == 0):
                 return
             for term in arr:
-                #if (term.lower() in self.bootstrap_entities): #Note this is a case insensitive check
-                #    term_entities = self.bootstrap_entities[term.lower()]
-                #else:
-                #    if (term not in untagged_items_dict):
-                #        untagged_items_dict[term] = OrderedDict()
-                #    for entity in curr_entities_dict:
-                #        if (entity not in untagged_items_dict[term]):
-                #            untagged_items_dict[term][entity] = curr_entities_dict[entity]
-                #        else:
-                #            untagged_items_dict[term][entity] += curr_entities_dict[entity]
-                #    continue
-                #We come here only for terms that were present in the bootstrap list. 
-                #Correction. We come here for all terms.  since above set is commented
                 if term not in full_entities_dict: #This is case sensitive. We want vocab entries eGFR and EGFR to pick up separate weights for their entities
                     full_entities_dict[term] = OrderedDict()
                 for entity in curr_entities_dict:
