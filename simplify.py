@@ -283,22 +283,22 @@ class BertEmbeds:
                     arr.append(k)
                     if (labeled_terms_count >= MAX_SUBWORD_PICKS):
                         break
-                print("Processing: ",key,"count:",count," of ",total)
+                #print("Processing: ",key,"count:",count," of ",total)
                 if (len(arr) >  0):
                     max_mean_term,max_mean, std_dev,s_dict = self.find_pivot_subgraph(arr,tokenize)
                     if (max_mean_term not in pivots_dict):
                         new_key  = max_mean_term
                     else:
-                        print("****Term already a pivot node:",max_mean_term, "key  is :",key)
+                        #print("****Term already a pivot node:",max_mean_term, "key  is :",key)
                         new_key  = max_mean_term + "++" + key
                     #pivots_dict[new_key] = {"key":new_key,"orig":key,"mean":max_mean,"terms":arr}
                     pivots_dict[key] = {"key":new_key,"orig":key,"mean":max_mean,"terms":arr}
                     entity_type,entity_counts,curr_entities_dict = self.get_entity_type(arr,new_key,esupfp)
                     self.aggregate_entities_for_terms(arr,curr_entities_dict,full_entities_dict,untagged_items_dict)
-                    print(entity_type,entity_counts,new_key,max_mean,std_dev,arr)
+                    #print(entity_type,entity_counts,new_key,max_mean,std_dev,arr)
                     dfp.write(entity_type + " " + entity_counts + " " + new_key + " " + new_key + " " + new_key+" "+key+" "+str(max_mean)+" "+ str(std_dev) + " " +str(arr)+"\n")
                 else:
-                    print("***Empty arr for term:",key)
+                    #print("***Empty arr for term:",key)
                     empty_arr.append(key)
 
             dfp.write(SINGLETONS_TAG + str(singletons_arr) + "\n")
