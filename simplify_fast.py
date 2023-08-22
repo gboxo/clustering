@@ -40,23 +40,6 @@ def read_embeddings(embeds_file):
     arr = np.array(embeds_list)
     return arr
 
-def calculate_scores(args):
-        term, terms, get_embedding_index, calc_inner_prod, tokenize = args
-        scores = []
-
-        index_term = get_embedding_index(term, tokenize)
-        for other_term in terms:
-            if term == other_term:
-                continue
-
-            index_other = get_embedding_index(other_term, tokenize)
-            val = calc_inner_prod(index_term, index_other)
-            scores.append(val)
-        
-        mean_score = sum(scores) / len(scores)
-        std_dev = math.sqrt(sum((score - mean_score) ** 2 for score in scores) / len(scores))
-
-        return term, mean_score, std_dev, scores
 
 def consolidate_labels(existing_node,new_labels,new_counts):
     """Consolidates all the labels and counts for terms ignoring casing
@@ -412,7 +395,7 @@ class BertEmbeds:
             return ret_str,count_str,entities_dict
 
 
-    """ def find_pivot_subgraph(self,terms,tokenize):
+    def find_pivot_subgraph(self,terms,tokenize):
             max_mean = 0
             std_dev = 0
             max_mean_term = None
@@ -449,39 +432,7 @@ class BertEmbeds:
                         #print("MEAN:",i,mean,std_dev)
             #print("MAX MEAN TERM:",max_mean_term)
             sorted_d = OrderedDict(sorted(means_dict.items(), key=lambda kv: kv[1], reverse=True))
-            return max_mean_term,round(max_mean,2),round(std_dev,2),sorted_d  """
- 
-
-#----------------------
-    
- 
-    def find_pivot_subgraph(self, terms, tokenize):
-        terms = [term.strip("\n") for term in terms]
-
-        if len(terms) == 1:
-            return terms[0], 1, 0, {terms[0]: 1}
-
-        max_mean = 0
-        max_mean_term = None
-        means_dict = {}
-        std_dev = 0
-
-        # Parallelize the calculation
-        with Pool(processes=cpu_count()) as pool:
-            args = [(term, terms, self.get_embedding_index, self.calc_inner_prod, tokenize) for term in terms]
-            results = pool.map(calculate_scores, args,chunksize=1000)
-        
-        # Post-process results
-        for term, mean_score, term_std_dev, scores in results:
-            means_dict[term] = mean_score
-            if mean_score > max_mean:
-                max_mean_term = term
-                max_mean = mean_score
-                std_dev = term_std_dev
-
-        sorted_means = OrderedDict(sorted(means_dict.items(), key=lambda kv: kv[1], reverse=True))
-
-        return max_mean_term, round(max_mean, 2), round(std_dev, 2), sorted_means
+            return max_mean_term,round(max_mean,2),round(std_dev,2),sorted_d  "
 
 #---------------------
 
